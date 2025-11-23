@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YogaVerse Pro - AI Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons (Still needed for other elements) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter (Professional Look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        :root {
+            /* DARK MODE (Default - Professional & Deep) */
+            --primary: #38bdf8; /* Sky-400 */
+            --primary-hover: #0ea5e9; /* Sky-500 */
+            --dark-bg: #0f172a; /* Slate-900 */
+            --card-bg-dark: #1e293b; /* Slate-800 - Solid for professionalism */
+            --text-main: #f1f5f9; /* Slate-100 */
+            --text-muted: #94a3b8; /* Slate-400 */
+            --whatsapp-green: #25D366;
+            --ai-accent: #a855f7; /* Violet-500 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
+        }
+        
+        /* LIGHT MODE OVERRIDES (More Attractive & Colorful) */
+        body.light-mode {
+            --dark-bg: #eff6ff; /* Blue-50 - Soft Sky Blue Background */
+            --card-bg-dark: #ffffff; /* White/Bright Cards */
+            --text-main: #1e3a8a; /* Blue-900 - Deep Blue Text */
+            --text-muted: #475569; /* Slate-600 */
+            --primary: #0ea5e9; /* Sky-500 - brighter primary */
+            --primary-hover: #0284c7; /* Sky-600 */
+            --ai-accent: #6366f1; /* Indigo-500 */
+        }
+
+        /* --- GRADIENT BG --- */
+        .bg-gradient-fixed {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            transition: background 0.5s ease;
+        }
+        body.light-mode .bg-gradient-fixed {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); /* Soft Blue Gradient */
+        }
+
+        /* --- PROFESSIONAL CARD STYLE --- */
+        .pro-card {
+            background-color: var(--card-bg-dark);
+            border: 1px solid var(--text-muted);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        body.light-mode .pro-card {
+            box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.2);
+            border: 1px solid #bfdbfe; /* Blue-200 */
+        }
+
+        /* --- PAGE TRANSITIONS (Smooth Fade/Slide) --- */
+        .page-section {
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+            opacity: 0;
+            transform: translateY(10px);
+            position: absolute;
+            width: 100%;
+            pointer-events: none;
+            top: 0; left: 0;
+            padding-top: 6rem;
+            padding-bottom: 2rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            display: none;
+            min-height: 100vh;
+        }
+
+        .page-section.active {
+            display: flex; /* Use flex to center content */
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            pointer-events: auto;
+        }
+        
+        /* --- HEADER STYLING --- */
+        header {
+            background: var(--dark-bg);
+            border-bottom: 1px solid var(--text-muted);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        body.light-mode header {
+             background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* --- INTERACTIVE ELEMENTS --- */
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark-bg); /* Dark background text on light button */
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+            transition: transform 0.15s, box-shadow 0.2s, background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 6px 15px rgba(56, 189, 248, 0.5);
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        /* AI Button Specific */
+        .btn-ai {
+            background: var(--ai-accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+        .btn-ai:hover {
+            background: #9333ea; /* Violet-600 */
+        }
+        
+        .pose-card-hover {
+            transition: all 0.3s ease;
+        }
+        .pose-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.25);
+        }
+        
+        /* Logo Container - IMPROVED FOR CLARITY */
+        .logo-circle {
+            width: 48px; 
+            height: 48px;
+            border-radius: 50%;
+            background: transparent; /* Transparent background for better dark mode look */
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); /* Stronger glow/shadow */
+            transition: all 0.3s ease;
+        }
+        body.light-mode .logo-circle {
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.8);
+        }
+        
+        .text-neeev {
+            color: var(--primary);
+        }
+
+        /* Chat styles */
+        .user-message {
+            background-color: var(--primary);
+            color: var(--dark-bg);
+            border-bottom-right-radius: 0;
+            align-self: flex-end;
+            max-width: 85%;
+        }
+
+        .ai-message {
+            background-color: var(--card-bg-dark);
+            border: 1px solid var(--text-muted);
+            border-bottom-left-radius: 0;
+            align-self: flex-start;
+            max-width: 85%;
+        }
+        
+        /* Error Message Style */
+        .login-error-text {
+            color: #f87171; /* Red-400 */
+            background-color: #fee2e222; /* Red-100/20% opacity */
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="bg-gradient-fixed"></div>
+
+    <!-- Header (Fixed) -->
+    <header class="fixed top-0 inset-x-0 z-50 h-20 flex items-center justify-between px-6 shadow-lg">
+        <div class="flex items-center gap-3">
+            <!-- LOGO (Custom SVG - Stylized Lotus/Person - IMPROVED) -->
+            <div class="logo-circle flex items-center justify-center relative">
+                <!-- Inline SVG for crispness and theme adaptation -->
+                <svg viewBox="0 0 48 48" class="w-8 h-8">
+                    <!-- Outer Ring/Aura (Represents AI/Technology) -->
+                    <circle cx="24" cy="24" r="22" stroke="var(--primary)" stroke-width="2.5" fill="none" opacity="0.8"/>
+                    <!-- Stylized Person in Lotus Pose (Represents Yoga/Health) -->
+                    <path d="M24 6 C26 6 27 10 27 12 C27 14 26 18 24 18 C22 18 21 14 21 12 C21 10 22 6 24 6 Z M24 18 L24 30 L20 30 C18 30 18 34 20 36 L24 36 L28 36 C30 34 30 30 28 30 L24 30 M18 36 L20 38 C18 42 30 42 28 38 L30 36" fill="var(--primary)" stroke="none"/>
+                </svg>
+            </div>
+            <span class="text-2xl font-black tracking-tight text-neeev">
+                YogaVerse Pro
+            </span>
+        </div>
+        
+        <!-- Menu Button (Always visible) -->
+        <button onclick="toggleMenu()" class="p-2.5 rounded-full hover:bg-white/10 transition active:scale-95">
+            <i data-lucide="menu" class="w-7 h-7 text-main"></i>
+        </button>
+    </header>
+
+    <!-- SLIDE-OUT MENU -->
+    <div id="side-menu" class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0">
+        <div class="absolute right-0 top-0 h-full w-72 bg-slate-900 border-l border-white/10 shadow-2xl p-6 transform translate-x-full transition-transform duration-300 flex flex-col" id="menu-panel">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-bold text-neeev" id="menu-title">सेटिंग्स</h3>
+                <button onclick="toggleMenu()" class="p-2 hover:bg-white/10 rounded-full"><i data-lucide="x" class="w-6 h-6 text-white"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="pro-card p-4 rounded-xl flex justify-between items-center bg-slate-800 text-white">
+                    <span class="text-sm font-medium" id="lbl-lang">भाषा (Language)</span>
+                    <button onclick="toggleLang()" id="lang-btn" class="text-xs font-bold bg-blue-500/20 text-blue-300 px-3 py-1 rounded-lg border border-blue-500/30">HI</button>
+                </div>
+                <div class="pro-card p-4 rounded-xl flex justify-between items-center bg-slate-800 text-white">
+                    <span class="text-sm font-medium" id="lbl-theme">थीम (Theme)</span>
+                    <button onclick="toggleTheme()" id="theme-btn" class="text-xs font-bold bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-lg border border-yellow-500/30">DARK</button>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <button onclick="navigate('login')" class="w-full py-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 font-bold flex items-center justify-center gap-2">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> <span id="btn-logout">लॉगआउट</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MAIN CONTENT AREA -->
+    <main class="relative max-w-5xl mx-auto">
+
+        <!-- 1. LOGIN PAGE (Professional & Animated) -->
+        <section id="login" class="page-section active justify-center items-center">
+            <div class="pro-card w-full max-w-sm p-8 rounded-3xl text-center fade-in-up" style="animation-delay: 0.1s;">
+                 <div class="mb-8">
+                    <h1 class="text-4xl font-extrabold text-neeev mb-1">YogaVerse Pro</h1>
+                    <!-- Subtitle removed as requested -->
+                </div>
+
+                <div class="pro-card p-6 rounded-2xl border border-white/5 shadow-inner">
+                    <h2 class="text-3xl font-bold text-main mb-6" id="login-card-title">यूज़र लॉगिन</h2>
+                    
+                    <div class="space-y-5 text-left">
+                        <div>
+                            <div class="relative">
+                                <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"></i>
+                                <!-- Added ID for JS validation -->
+                                <input type="text" id="login-email" placeholder="Email or Phone" class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3.5 pl-10 pr-4 text-main focus:border-primary-hover focus:ring-1 focus:ring-primary-hover outline-none transition animated-input placeholder-slate-400">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="relative">
+                                <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"></i>
+                                <!-- Added ID for JS validation -->
+                                <input type="password" id="login-password" placeholder="Password" class="w-full bg-slate-700 border border-slate-600 rounded-xl py-3.5 pl-10 pr-4 text-main focus:border-primary-hover focus:ring-1 focus:ring-primary-hover outline-none transition animated-input placeholder-slate-400">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Message Display Area -->
+                    <p id="login-error" class="login-error-text mt-5 hidden"></p>
+
+                    <!-- Changed onclick to call handleLogin() for validation -->
+                    <button onclick="handleLogin()" class="btn-primary w-full py-4 rounded-xl font-bold text-lg mt-8 flex items-center justify-center gap-2">
+                        <span id="btn-login">लॉगिन करें</span> <i data-lucide="log-in" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. DASHBOARD -->
+        <section id="dashboard" class="page-section flex-1">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-main mb-2" id="dash-title">योग आसनों की सूची</h2>
+                <p class="text-neeev text-lg italic font-medium" id="dash-motto">"योग वह प्रकाश है जो एक बार जल जाए तो कभी कम नहीं होता।"</p>
+                <div class="w-24 h-1 bg-blue-500 mx-auto mt-4 rounded-full"></div>
+                
+                <!-- Search Bar & AI Button -->
+                <div class="mt-8 relative max-w-md mx-auto flex gap-3">
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted"></i>
+                        <!-- FIX: Solid background for visibility in dark mode -->
+                        <input type="text" id="search-input" onkeyup="filterPoses()" placeholder="Search asana..." class="w-full bg-slate-700 border border-slate-600 rounded-full py-3 pl-12 pr-4 text-main focus:border-primary outline-none placeholder-slate-400 transition">
+                    </div>
+                    <!-- New AI Button -->
+                    <button onclick="navigate('ai-chat')" class="btn-ai w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pose Grid -->
+            <div id="pose-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-10 flex-1">
+                <!-- JS will fill this -->
+            </div>
+
+            <!-- CONTACT US SECTION (Footer - Always at the bottom of the dashboard) -->
+            <div class="pro-card rounded-2xl p-8 mt-12 mb-12 text-center border border-white/10">
+                <h3 class="text-2xl font-bold text-main mb-2">Contact Us</h3>
+                <p class="text-muted mb-6">किसी भी सहायता या सुझाव के लिए हमसे संपर्क करें।</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="https://wa.me/9810644760" target="_blank" class="btn-primary btn-whatsapp px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-transform hover:scale-105" style="background-color: var(--whatsapp-green); color: white;">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i> WhatsApp Chat
+                    </a>
+                    <a href="mailto:yogaverse@gmail.com" class="pro-card px-6 py-3 rounded-xl font-bold text-main flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+                        <i data-lucide="mail" class="w-5 h-5 text-neeev"></i> Email (yogaverse@gmail.com)
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 3. DETAILS PAGE -->
+        <section id="details" class="page-section flex-1">
+            <button onclick="navigate('dashboard')" class="mb-6 flex items-center text-primary font-bold hover:opacity-80 transition bg-white/5 px-4 py-2 rounded-lg w-fit border border-white/10">
+                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> <span id="btn-back">वापस जाएं</span>
+            </button>
+
+            <div class="pro-card rounded-3xl p-6 md:p-8 border-t border-white/10 flex-1">
+                <div class="flex justify-between items-start mb-6 border-b border-gray-500/20 pb-6">
+                    <div>
+                        <h1 id="d-name" class="text-3xl md:text-4xl font-black text-main mb-1"></h1>
+                        <p id="d-sanskrit" class="text-xl text-primary font-serif italic"></p>
+                    </div>
+                    <div class="bg-primary/20 p-3 rounded-full text-primary">
+                         <i data-lucide="activity" class="w-8 h-8"></i>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                         <h3 class="text-lg font-bold text-primary mb-3 flex items-center"><i data-lucide="info" class="w-5 h-5 mr-2"></i> <span id="lbl-info">परिचय</span></h3>
+                         <div class="bg-primary/5 p-4 rounded-xl border-l-4 border-primary">
+                            <p id="d-info" class="text-main leading-relaxed"></p>
+                         </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-green-400 mb-3 flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 mr-2"></i> <span id="lbl-benefits">फायदे</span></h3>
+                        <ul id="d-benefits" class="list-disc pl-5 text-muted space-y-2 marker:text-green-500"></ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-red-400 mb-3 flex items-center"><i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i> <span id="lbl-cautions">सावधानियाँ</span></h3>
+                        <ul id="d-cautions" class="list-disc pl-5 text-muted space-y-2 marker:text-red-500"></ul>
+                    </div>
+                </div>
+
+                <button onclick="showAnimation()" class="btn-primary w-full py-4 rounded-xl font-bold text-xl mt-10 flex items-center justify-center gap-2">
+                    <i data-lucide="play-circle" class="w-6 h-6"></i> <span id="btn-anim">एनीमेशन देखें</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. ANIMATION PAGE -->
+        <section id="animation" class="page-section text-center flex-1">
+            <button onclick="navigate('details')" class="mb-6 flex items-center text-primary font-bold hover:opacity-80 transition mx-auto bg-white/5 px-4 py-2 rounded-lg border border-white/10">
+                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> <span id="btn-back-anim">विवरण पर वापस</span>
+            </button>
+
+            <div class="pro-card rounded-3xl p-4 md:p-8 border border-white/10 flex-1">
+                <h2 id="a-title" class="text-3xl font-bold text-main mb-2"></h2>
+                <p class="text-muted mb-8 text-sm" id="lbl-anim-sub">सही तकनीक के लिए नीचे देखें</p>
+
+                <!-- Video Placeholder -->
+                <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl flex flex-col items-center justify-center group">
+                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
+                    <i data-lucide="youtube" class="w-16 h-16 text-red-500 mb-4 group-hover:scale-110 transition duration-300"></i>
+                    <p class="text-slate-300 font-medium px-4">Video / Animation Placeholder</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. AI CHAT PAGE (New) -->
+        <section id="ai-chat" class="page-section flex-1">
+            <button onclick="navigate('dashboard')" class="mb-6 flex items-center text-primary font-bold hover:opacity-80 transition bg-white/5 px-4 py-2 rounded-lg w-fit border border-white/10">
+                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> <span id="btn-back-chat">डैशबोर्ड पर वापस</span>
+            </button>
+
+            <div class="pro-card rounded-3xl p-4 md:p-6 border border-white/10 flex-1 flex flex-col">
+                <h2 class="text-3xl font-bold text-main mb-4 flex items-center text-ai-accent">
+                    <i data-lucide="bot" class="w-6 h-6 mr-3"></i> <span id="chat-title">AI योग असिस्टेंट</span>
+                </h2>
+                <p class="text-muted mb-6 text-sm" id="chat-subtitle">योग, स्वास्थ्य और आसन के बारे में कोई भी प्रश्न पूछें।</p>
+                
+                <!-- Chat Window -->
+                <div id="chat-window" class="flex-1 overflow-y-auto space-y-4 p-3 mb-4 rounded-xl border border-slate-700 bg-slate-900/50" style="min-height: 300px;">
+                    <!-- Messages will be appended here -->
+                    <div class="ai-message p-3 rounded-xl text-sm italic border-slate-700">
+                        <p id="chat-initial">नमस्ते! मैं YogaVerse Pro का AI असिस्टेंट हूँ, आपका योग सारथी। आपके कल्याण और अभ्यास में मैं कैसे सहायता कर सकता हूँ?</p>
+                    </div>
+                </div>
+
+                <!-- Input and Send Button -->
+                <div class="flex gap-3">
+                    <!-- FIX: Solid background for visibility in dark mode -->
+                    <input 
+                        type="text" 
+                        id="chat-input" 
+                        placeholder="यहां अपना प्रश्न टाइप करें..." 
+                        class="flex-1 bg-slate-700 border border-slate-600 rounded-full py-3 px-5 text-main focus:border-ai-accent outline-none placeholder-slate-400 transition"
+                        onkeypress="if(event.key === 'Enter') sendMessage()"
+                    >
+                    <button id="send-btn" onclick="sendMessage()" class="btn-ai w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform disabled:opacity-50">
+                        <i data-lucide="send" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div id="loading-indicator" class="mt-2 text-center hidden">
+                    <p class="text-ai-accent text-sm font-medium flex items-center justify-center">
+                        <i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i>
+                        AI जवाब लिख रहा है...
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+
+    </main>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- ICONS INIT ---
+        lucide.createIcons();
+
+        // Gemini API Key (Will be auto-filled by the environment)
+        const apiKey = "AIzaSyDlfU7kibAE9WU25mPZhVF7yvy6ReLtbY8"; 
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // --- DATA (22 ASANAS - 7 Points Each) ---
+        const poses = [
+            {id:'tadasana', hi:'ताड़ासन', en:'Tadasana', sanskrit:'Mountain Pose', 
+             info:'यह सभी खड़े आसनों की नींव है। यह शरीर को सीधा और तना हुआ रखने में मदद करता है।', 
+             benefits:['मुद्रा (Posture) में सुधार करता है।','जांघों, घुटनों और टखनों को मजबूत करता है।','पेट और नितंबों को टोन करता है।','सपाट पैरों (flat feet) को कम करने में मदद करता है।','रीढ़ की हड्डी को लचीला बनाता है।','संतुलन और एकाग्रता बढ़ाता है।','श्वसन प्रणाली को बेहतर बनाता है।'], 
+             cautions:['सिरदर्द होने पर न करें।','अनिद्रा की समस्या में सावधानी बरतें।','निम्न रक्तचाप में अधिक देर तक न करें।','चक्कर आने पर तुरंत रुक जाएं।','गर्भावस्था में दीवार का सहारा लें।','घुटनों में गंभीर दर्द हो तो बचें।','लंबे समय तक एक ही स्थिति में न रहें।']},
+            {id:'vrikshasana', hi:'वृक्षासन', en:'Vrikshasana', sanskrit:'Tree Pose', 
+             info:'यह एक संतुलन बनाने वाला आसन है जो पेड़ की स्थिरता की नकल करता है।', 
+             benefits:['पैरों को मजबूत और लचीला बनाता है।','न्यूरो-मस्कुलर समन्वय में सुधार करता है।','एकाग्रता और धैर्य बढ़ाता है।','सा साइटिका के दर्द में राहत देता है।','कूल्हों को खोलता है।','संतुलन की भावना विकसित करता है।','आत्मविश्वास बढ़ाता है।'], 
+             cautions:['माइग्रेन या सिरदर्द में न करें।','उच्च या निम्न रक्तचाप में सावधानी रखें।','घुटने की चोट होने पर न करें।','अनिद्रा की समस्या में शाम को न करें।','चक्कर आने पर दीवार का सहारा लें।','पैर को घुटने के जोड़ पर न रखें।','शुरुआत में आंखें बंद न करें।']},
+            {id:'adhomukha', hi:'अधोमुख श्वानासन', en:'Downward Dog', sanskrit:'Adho Mukha Svanasana', 
+             info:'यह शरीर को उल्टा V आकार में लाने वाला एक बहुत ही लोकप्रिय आसन है।', 
+             benefits:['पूरे शरीर को स्ट्रेच करता है।','कंधों और बाहों को मजबूत करता है।','मस्तिष्क को शांत करता है और तनाव कम करता है।','पाचन में सुधार करता है।','सिरदर्द और अनिद्रा में राहत देता है।','पीठ दर्द को कम करने में मदद करता है।','ऊर्जा का संचार करता है।'], 
+             cautions:['कार्पल टनल सिंड्रोम में न करें।','उच्च रक्तचाप में सिर नीचे न रखें।','गर्भावस्था के अंतिम चरण में बचें।','कंधे की चोट में सावधानी बरतें।','दस्त होने पर न करें।','आंखों की सर्जरी के बाद न करें।','कलाई में दर्द हो तो वजन न डालें।']},
+            {id:'trikonasana', hi:'त्रिकोणासन', en:'Trikonasana', sanskrit:'Triangle Pose', 
+             info:'यह आसन शरीर के किनारों (sides) को फैलाने और मजबूत करने के लिए उत्कृष्ट है।', 
+             benefits:['पैरों, घुटनों और टखनों को मजबूत करता है।','कूल्हों, कमर और हैमस्ट्रिंग को स्ट्रेच करता है।','पाचन अंगों को उत्तेजित करता है।','तनाव और चिंता को कम करता है।','कमर दर्द में राहत देता है।','गर्दन के लचीलेपन में सुधार करता है।','शारीरिक संतुलन बढ़ाता है।'], 
+             cautions:['माइग्रेन होने पर न करें।','निम्न रक्तचाप में सिर नीचे न झुकाएं।','गर्दन में चोट हो तो ऊपर न देखें।','दस्त होने पर न करें।','हृदय की समस्याओं में सावधानी रखें।','घुटनों को लॉक न करें।','स्लिप डिस्क में आगे न झुकें।']},
+            {id:'bhujangasana', hi:'भुजंगासन', en:'Bhujangasana', sanskrit:'Cobra Pose', 
+             info:'यह आसन पीठ को पीछे की ओर मोड़ने वाला है जो रीढ़ को लचीला बनाता है।', 
+             benefits:['रीढ़ की हड्डी को मजबूत करता है।','छाती, फेफड़े, कंधों और पेट को स्ट्रेच करता है।','तनाव और थकान को दूर करता है।','साइटिका के दर्द में राहत देता है।','अस्थमा के लिए चिकित्सीय है।','पेट के अंगों को उत्तेजित करता है।','नितंबों को फर्म करता है।'], 
+             cautions:['गर्भावस्था में न करें।','पीठ की गंभीर चोट में बचें।','कलाई की समस्या में सावधानी रखें।','सिरदर्द होने पर न करें।','हर्निया के रोगियों को नहीं करना चाहिए।','पेट की सर्जरी के बाद न करें।','गर्दन को ज्यादा पीछे न झुकाएं।']},
+            {id:'balasana', hi:'बालासन', en:'Balasana', sanskrit:'Child Pose', 
+             info:'यह एक विश्रामदायक आसन है जो मन और शरीर को शांत करता है।', 
+             benefits:['पीठ और गर्दन के तनाव को दूर करता है।','कूल्हों, जांघों और टखनों को स्ट्रेच करता है।','मस्तिष्क को शांत करता है।','तनाव और थकान को कम करता है।','पाचन में सहायता करता है।','रक्त परिसंचरण को सामान्य करता है।','मासिक धर्म के दर्द में राहत देता है।'], 
+             cautions:['गर्भावस्था में घुटने चौड़े रखें।','घुटने की चोट में न करें।','दस्त होने पर बचें।','टखने की समस्या में कुशन का प्रयोग करें।','उच्च रक्तचाप में सावधानी बरतें।','पेट के संक्रमण में न करें।','सांस लेने में तकलीफ हो तो न करें।']},
+            {id:'shavasana', hi:'शवासन', en:'Shavasana', sanskrit:'Corpse Pose', 
+             info:'यह पूर्ण विश्राम की मुद्रा है, जो आमतौर पर योग सत्र के अंत में की जाती है।', 
+             benefits:['पूरे शरीर को गहरा विश्राम देता है।','तनाव और अवसाद को कम करता है।','रक्तचाप को कम करने में मदद करता है।','एकाग्रता और स्मृति में सुधार करता है।','ऊर्जा के स्तर को बढ़ाता है।','अनिद्रा को ठीक करता है।','तंत्रिका तंत्र को शांत करता है।'], 
+             cautions:['सोना नहीं चाहिए, जागते रहें।','पीठ दर्द में घुटनों के नीचे तकिया रखें।','ठंडी जगह पर कंबल का प्रयोग करें।','गर्भावस्था में करवट लेकर लेटें।','मन को भटकने न दें।','आंखें बंद रखें।','शरीर को बिल्कुल ढीला छोड़ दें।']},
+            {id:'padmasana', hi:'पद्मासन', en:'Padmasana', sanskrit:'Lotus Pose', 
+             info:'यह ध्यान और प्राणायाम के लिए सबसे उपयुक्त आसन माना जाता है।', 
+             benefits:['मन को शांत और एकाग्र करता है।','पाचन प्रक्रिया को सक्रिय करता है।','रीढ़ की हड्डी को सीधा रखता है।','घुटनों और टखनों को स्ट्रेच करता है।','मासिक धर्म की समस्याओं में लाभकारी।','साइटिका में राहत दे सकता है।','ऊर्जा के प्रवाह को बढ़ाता है।'], 
+             cautions:['घुटने की चोट में न करें।','टखने में दर्द हो तो बचें।','साइटिका के गंभीर मामलों में न करें।','गर्भावस्था के अंत में सावधानी रखें।','जबरदस्ती पैर न मोड़ें।','पिंडलियों में दर्द हो तो न करें।','शुरुआत में दीवार का सहारा लें।']},
+            {id:'setubandhasana', hi:'सेतुबंधासन', en:'Setu Bandhasana', sanskrit:'Bridge Pose', 
+             info:'इस आसन में शरीर एक पुल की तरह दिखता है, जो पीठ और गर्दन के लिए अच्छा है।', 
+             benefits:['छाती, गर्दन और रीढ़ को स्ट्रेच करता है।','मस्तिष्क को शांत करता है और तनाव कम करता है।','फेफड़ों की क्षमता बढ़ाता है।','थायराइड ग्रंथि को उत्तेजित करता है।','पाचन में सुधार करता है।','थकान और चिंता को दूर करता है।','रजोनिवृत्ति के लक्षणों में मदद करता है।'], 
+             cautions:['गर्दन की चोट में न करें।','पीठ दर्द में सावधानी बरतें।','कंधे की चोट में न करें।','घुटने के दर्द में न करें।','गर्भावस्था के अंतिम चरणों में बचें।','सिर को दाएं-बाएं न घुमाएं।','हर्निया के रोगी न करें।']},
+            {id:'halasana', hi:'हलासन', en:'Halasana', sanskrit:'Plow Pose', 
+             info:'यह आसन शरीर को हल (plow) के आकार में मोड़ता है, जो लचीलेपन के लिए बेहतरीन है।', 
+             benefits:['रीढ़ की हड्डी को लचीला और मजबूत बनाता है।','कंधों और गर्दन को स्ट्रेच करता है।','थायराइड ग्रंथि को उत्तेजित करता है।','पाचन अंगों की मालिश करता है।','तनाव और थकान को कम करता है।','वजन घटाने में सहायक है।','रक्त शर्करा के स्तर को नियंत्रित करता है।'], 
+             cautions:['गर्दन की चोट में बिल्कुल न करें।','उच्च रक्तचाप में न करें।','गर्भावस्था में न करें।','मासिक धर्म के दौरान न करें।','अस्थमा में सावधानी बरतें।','पीठ दर्द में न करें।','जबरदस्ती पैर पीछे न ले जाएं।']},
+            {id:'virabhadrasana1', hi:'वीरभद्रासन I', en:'Virabhadrasana I', sanskrit:'Warrior I', 
+             info:'शक्ति और साहस का प्रतीक, यह आसन पैरों और कोर को मजबूत करता है।', 
+             benefits:['छाती और फेफड़ों को फैलाता है।','कंधों और बाहों को मजबूत करता है।','पैरों और टखनों को शक्तिशाली बनाता है।','संतुलन में सुधार करता है।','कूल्हों को खोलता है।','एकाग्रता बढ़ाता है।','रक्त परिसंचरण में सुधार करता है।'], 
+             cautions:['हृदय की समस्याओं में न करें।','उच्च रक्तचाप में हाथ ऊपर न रखें।','कंधे की चोट में हाथ समानांतर रखें।','गर्दन दर्द में ऊपर न देखें।','घुटने के दर्द में सावधानी बरतें।','संतुलन की समस्या में दीवार का सहारा लें।','गर्भावस्था में पैर कम खोलें।']},
+                         {id:'virabhadrasana2', hi:'वीरभद्रासन II', en:'Virabhadrasana II', sanskrit:'Warrior II', 
+             info:'यह आसन सहनशक्ति और स्थिरता बढ़ाने के लिए जाना जाता है।', 
+             benefits:['कूल्हों और जांघों को खोलता है।','पेट के अंगों को उत्तेजित करता है।','सहनशक्ति (Stamina) बढ़ाता है।','पीठ दर्द में राहत देता है।','कार्पस और पैरों को टोन करता है।','संतुलन और स्थिरता लाता है।','श्वसन क्षमता बढ़ाता है।'], 
+             cautions:['दस्त होने पर न करें।','उच्च रक्तचाप में सावधानी रखें।','गर्दन की समस्याओं में सिर न घुमाएं।','घुटने की चोट में बचें।','हिप रिप्लेसमेंट के बाद न करें।','कंधों में दर्द हो तो हाथ नीचे रखें।','ज्यादा देर तक न रुकें अगर थकान हो।']},
+            {id:'utkatasana', hi:'उत्कटासन', en:'Utkatasana', sanskrit:'Chair Pose', 
+             info:'यह आसन काल्पनिक कुर्सी पर बैठने जैसा है, जो इच्छाशक्ति और पैरों को मजबूत करता है।', 
+             benefits:['टखनों, जांघों और पिंडलियों को मजबूत करता है।','कंधों और छाती को स्ट्रेच करता है।','सपाट पैरों में सुधार करता है।','पेट के अंगों को उत्तेजित करता है।','हृदय को उत्तेजित करता है।','पीठ को मजबूत करता है।','संकल्प शक्ति बढ़ाता है।'], 
+             cautions:['सिरदर्द में न करें।','अनिद्रा में न करें।','निम्न रक्तचाप में सावधानी रखें।','घुटने की चोट में न करें।','टखने की मोच में बचें।','गर्भावस्था में दीवार का सहारा लें।','मासिक धर्म में न करें。']},
+            {id:'dhanurasana', hi:'धनुरासन', en:'Dhanurasana', sanskrit:'Bow Pose', 
+             info:'शरीर धनुष के आकार का बनता है, जो पीठ और पेट के लिए लाभकारी है।', 
+             benefits:['पूरी रीढ़ को पीछे की ओर मोड़ता है।','पेट की चर्बी कम करता है।','पाचन और कब्ज में सुधार करता है।','छाती और गर्दन को खोलता है।','पैरों और बाहों को टोन करता है।','गुर्दे के कार्यों में सुधार करता है।','तनाव और थकान दूर करता है।'], 
+             cautions:['उच्च या निम्न रक्तचाप में न करें।','हर्निया में न करें।','गर्दन की चोट में न करें।','पीठ के निचले हिस्से में दर्द हो तो बचें।','गर्भावस्था में न करें।','हाल ही में पेट की सर्जरी हुई हो तो न करें।','माइग्रेन में न करें।']},
+            {id:'sarvangasana', hi:'सर्वांगासन', en:'Sarvangasana', sanskrit:'Shoulder Stand', 
+             info:'इसे सभी आसनों की रानी कहा जाता है, जो पूरे शरीर को लाभ पहुँचाता है।', 
+             benefits:['मस्तिष्क में रक्त प्रवाह बढ़ाता है।','थायराइड और पैराथायराइड ग्रंथियों को उत्तेजित करता है।','कंधों और गर्दन को स्ट्रेच करता है।','पाचन में सुधार करता है।','पैर और पेट की कमजोरी दूर करता है।','बालों के झड़ने को कम करता है।','चेहरे की चमक बढ़ाता है।'], 
+             cautions:['गर्दन की चोट में बिल्कुल न करें।','उच्च रक्तचाप में न करें।','मासिक धर्म के दौरान न करें।','गर्भावस्था में न करें।','हृदय रोग में बचें।','स्लिप डिस्क में न करें।','कान के संक्रमण में न करें。']},
+            {id:'matsyasana', hi:'मत्स्यासन', en:'Matsyasana', sanskrit:'Fish Pose', 
+             info:'यह आसन छाती को खोलता है और सर्वांगासन का प्रति-आसन (counter-pose) है।', 
+             benefits:['छाती और गर्दन को स्ट्रेच करता है।','फेफड़ों की क्षमता बढ़ाता है।','कंधों और गर्दन के तनाव को दूर करता है।','थायराइड ग्रंथि को लाभ देता है।','पीठ के ऊपरी हिस्से को मजबूत करता है।','कब्ज में राहत देता。','मासिक धर्म के दर्द में मदद करता。'], 
+             cautions:['उच्च या निम्न रक्तचाप में न करें。','माइग्रेन में न करें。','अनिद्रा में न करें।','पीठ या गर्दन की गंभीर चोट में बचें।','चक्कर आने पर न करें。','गर्भावस्था में सावधानी बरतें。','घुटने के दर्द में पैर सीधे रखें。']},
+            {id:'ustrasana', hi:'उष्ट्रासन', en:'Ustrasana', sanskrit:'Camel Pose', 
+             info:'यह घुटनों के बल पीछे झुकने वाला आसन है जो शरीर के सामने के हिस्से को खोलता है।', 
+             benefits:['छाती और पेट को पूरी तरह स्ट्रेच करता है।','पाचन में सुधार करता है।','कंधों और पीठ को मजबूत करता है।','थायराइड को उत्तेजित करता है।','सांस लेने की क्षमता बढ़ाता है।','रीढ़ की हड्डी को लचीला बनाता है।','शरीर की मुद्रा सुधारता है。'], 
+             cautions:['उच्च या निम्न रक्तचाप में न करें।','माइग्रेन में न करें。','गर्दन की चोट में सावधानी रखें。','पीठ के निचले हिस्से में दर्द हो तो बचें।','घुटने की चोट में कुशन का प्रयोग करें।','अनिद्रा में न करें。','हाल ही में सर्जरी हुई हो तो न करें。']},
+            {id:'gomukhasana', hi:'गोमुखासन', en:'Gomukhasana', sanskrit:'Cow Face Pose', 
+             info:'यह आसन कूल्हों और कंधों के लचीलेपन के लिए उत्कृष्ट है।', 
+             benefits:['कंधों और कूल्हों को स्ट्रेच करता है।','पीठ दर्द में राहत देता。','साइटिका में लाभकारी है।','गुर्दे को उत्तेजित करता है।','हृदय चक्र को खोलता है।','तनाव और चिंता कम करता。','एकाग्रता बढ़ाता。'], 
+             cautions:['कंधे की चोट में हाथ न बांधें।','घुटने के दर्द में न करें。','गर्दन दर्द में सामने देखें।','गर्भावस्था के पहले तिमाही के बाद न करें。','बवासीर में न करें。','यदि कूल्हे बहुत सख्त हों तो कुशन पर बैठें।','जबरदस्ती स्ट्रेच न करें。']},
+            {id:'natarajasana', hi:'नटराजासन', en:'Natarajasana', sanskrit:'Dancer Pose', 
+             info:'यह एक सुंदर संतुलन आसन है जो भगवान शिव के नृत्य का प्रतीक है।', 
+             benefits:['संतुलन और एकाग्रता बढ़ाता है।','कंधों और छाती को स्ट्रेच करता है।','जांघों और पेट को मजबूत करता।','वजन घटाने में मदद करता है।','मुद्रा में सुधार करता है।','मन को शांत करता है。','पैरों को टोन करता है।'], 
+             cautions:['निम्न रक्तचाप में न करें।','चक्कर आने पर न करें।','पीठ की चोट में सावधानी रखें。','घुटने के दर्द में न करें।','कंधे की जकड़न में स्ट्रेप का प्रयोग करें।','गर्भावस्था में दीवार का सहारा लें।','स्लिप डिस्क में बचें。']},
+            {id:'chaturanga', hi:'चतुरंग दंडासन', en:'Chaturanga Dandasana', sanskrit:'Four-Limbed Staff Pose', 
+             info:'यह एक शक्तिशाली प्लैंक जैसा आसन है जो बाहों और कोर को मजबूत करता है।', 
+             benefits:['बाहों और कलाई को मजबूत करता है।','पेट की मांसपेशियों को टोन करता है।','शरीर की गर्मी बढ़ाता है।','मुद्रा में सुधार करता है।','स्टैमिना बढ़ाता है।','दिमाग को सक्रिय करता है।','पीठ की मांसपेशियों को मजबूत करता。'], 
+             cautions:['कार्पल टनल सिंड्रोम में न करें।','कलाई की चोट में न करें।','गर्भावस्था में घुटने टेकें।','कंधे की चोट में बचें।','कमर दर्द में न करें。','उच्च रक्तचाप में सावधानी रखें।','कोहनियों को शरीर से दूर न जाने दें。']},
+            {id:'bakasana', hi:'बकासन', en:'Bakasana', sanskrit:'Crow Pose', 
+             info:'यह एक आर्म बैलेंस आसन है जो बाहों और कोर की ताकत बढ़ाता है।', 
+             benefits:['बाहों और कलाई को बहुत मजबूत करता है।','पेट की मांसपेशियों को टोन करता है।','ऊपरी पीठ को स्ट्रेच करता है।','एकाग्रता और संतुलन बढ़ाता है。','आत्मविश्वास बढ़ाता है।','हिप्स को खोलता。','पाचन में सुधार करता。'], 
+             cautions:['कार्पल टनल सिंड्रोम में न करें।','कलाई की चोट में न करें。','गर्भावस्था में न करें。','कंधे के दर्द में बचें।','चक्कर आने पर न करें。','सामने कुशन रखें गिरने के डर से।','उच्च रक्तचाप में न करें。']},
+            {id:'sirsasana', hi:'शीर्षासन', en:'Sirsasana', sanskrit:'Headstand', 
+             info:'इसे आसनों का राजा कहा जाता है, यह शरीर को उल्टा करने वाला शक्तिशाली आसन है।', 
+             benefits:['मस्तिष्क को ऑक्सीजन युक्त रक्त पहुंचाता है।','याददाश्त और एकाग्रता बढ़ाता है。','तनाव और चिंता को दूर करता है।','पाचन में सुधार करता है।','बालों का झड़ना कम करता है।','कोर मसल्स को मजबूत करता。','आत्मविश्वास और फोकस बढ़ाता है।'], 
+             cautions:['उच्च रक्तचाप में बिल्कुल न करें।','गर्दन की चोट में न करें।','हृदय रोग में बचें।','मासिक धर्म के दौरान न करें。','गर्भावस्था में बिना विशेषज्ञ के न करें।','आंखों की समस्या (ग्लूकोमा) में न करें।','शुरुआत में दीवार का सहारा लें。']}
+        ];
+
+        // --- STATE & CHAT HISTORY ---
+        let state = { lang: 'hi', theme: 'dark', currentPose: null };
+        let chatHistory = []; // To store conversation history
+
+        // --- DICTIONARY ---
+        const DICT = {
+            hi: {
+                login_header: "यूज़र लॉगिन",
+                motto: "योग: शरीर की भाषा में आत्मा की कविता।",
+                dash_title: "योग आसनों की सूची",
+                dash_motto: "अपने अभ्यास को बेहतर बनाने के लिए कोई भी आसन चुनें।",
+                search_ph: "आसन खोजें...",
+                btn_back: "वापस जाएं",
+                lbl_info: "परिचय",
+                lbl_benefits: "फायदे",
+                lbl_cautions: "सावधानियाँ",
+                btn_anim: "एनीमेशन देखें",
+                lbl_anim_sub: "सही तकनीक के लिए नीचे देखें",
+                btn_back_anim: "विवरण पर वापस",
+                menu_title: "सेटिंग्स",
+                lbl_lang: "भाषा (Language)",
+                lbl_theme: "थीम (Theme)",
+                btn_logout: "लॉगआउट",
+                theme_dark: "DARK",
+                theme_light: "LIGHT",
+                login_btn: "लॉगिन करें",
+                chat_title: "AI योग असिस्टेंट",
+                chat_subtitle: "योग, स्वास्थ्य और आसन के बारे में कोई भी प्रश्न पूछें।",
+                btn_back_chat: "डैशबोर्ड पर वापस",
+                chat_loading: "AI जवाब लिख रहा है...",
+                // UPDATED: More personal/friendly initial message
+                chat_initial: "नमस्ते! मैं YogaVerse Pro का AI असिस्टेंट हूँ, आपका योग सारथी। आपके कल्याण और अभ्यास में मैं कैसे सहायता कर सकता हूँ?", 
+                login_error: "कृपया ईमेल/फ़ोन और पासवर्ड दोनों भरें।"
+            },
+                        en: {
+                login_header: "User Login",
+                motto: "Yoga: The poetry of the soul in the language of the body.",
+                dash_title: "List of Yoga Asanas",
+                dash_motto: "Choose any pose to deepen your practice.",
+                search_ph: "Search asana...",
+                btn_back: "Go Back",
+                lbl_info: "Introduction",
+                lbl_benefits: "Benefits",
+                lbl_cautions: "Cautions",
+                btn_anim: "View Animation",
+                lbl_anim_sub: "See below for correct technique",
+                btn_back_anim: "Back to Details",
+                menu_title: "Settings",
+                lbl_lang: "Language",
+                lbl_theme: "Theme",
+                btn_logout: "Logout",
+                theme_dark: "DARK",
+                theme_light: "LIGHT",
+                login_btn: "Login",
+                chat_title: "AI Yoga Assistant",
+                chat_subtitle: "Ask any question about yoga, health, and asanas.",
+                btn_back_chat: "Back to Dashboard",
+                chat_loading: "AI is writing a response...",
+                // UPDATED: More personal/friendly initial message
+                chat_initial: "Hello! I am the YogaVerse Pro AI Assistant, your Yoga Companion. How can I assist you with your wellness and practice today?", 
+                login_error: "Please fill in both Email/Phone and Password."
+            }
+        };
+        
+        // --- LOGIN VALIDATION ---
+        function handleLogin() {
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+            const errorDisplay = document.getElementById('login-error');
+            
+            // 1. Hide any previous error message
+            errorDisplay.classList.add('hidden');
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // 2. Simple validation: Check if fields are empty
+            if (email === '' || password === '') {
+                const t = DICT[state.lang];
+                // Display error message
+                errorDisplay.textContent = t.login_error;
+                errorDisplay.classList.remove('hidden');
+                
+                // Add temporary shake effect for better UX
+                emailInput.focus();
+                
+                return; // Stop login process
+            }
+
+            // 3. SUCCESS: Clear fields (optional) and navigate
+            // In a real application, Firebase authentication would be called here.
+            // If successful, then navigate.
+            
+            // Simulating successful login:
+            emailInput.value = '';
+            passwordInput.value = '';
+            navigate('dashboard');
+        }
+
+
+        // --- NAVIGATION ---
+        function navigate(pageId) {
+            document.querySelectorAll('.page-section').forEach(el => {
+                el.classList.remove('active');
+                setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 400); // Increased delay for smoother transition
+            });
+            
+            const target = document.getElementById(pageId);
+            target.style.display = 'flex';
+            setTimeout(() => target.classList.add('active'), 50);
+
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            if (pageId === 'dashboard') renderGrid();
+            toggleMenu(true);
+        }
+
+        // --- RENDER GRID ---
+        function renderGrid() {
+            const grid = document.getElementById('pose-grid');
+            grid.innerHTML = '';
+            const term = document.getElementById('search-input').value.toLowerCase();
+
+            poses.filter(p => 
+                p.hi.toLowerCase().includes(term) || 
+                p.en.toLowerCase().includes(term)
+            ).forEach(pose => {
+                const name = state.lang === 'hi' ? pose.hi : pose.en;
+                const div = document.createElement('div');
+                div.className = 'pro-card rounded-2xl p-5 pose-card-hover cursor-pointer border border-white/5 relative overflow-hidden group';
+                div.onclick = () => loadDetails(pose);
+                
+                div.innerHTML = `
+                    <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition">
+                        <i data-lucide="flower" class="w-16 h-16 text-cyan-400"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <span class="text-xs font-bold tracking-wider text-cyan-400 uppercase mb-1 block">${pose.sanskrit}</span>
+                        <h3 class="text-xl font-bold text-main mb-2">${name}</h3>
+                        <div class="h-1 w-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"></div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function filterPoses() { renderGrid(); }
+
+        // --- LOAD DETAILS ---
+        function loadDetails(pose) {
+            state.currentPose = pose;
+            const isHi = state.lang === 'hi';
+            
+            document.getElementById('d-name').textContent = isHi ? pose.hi : pose.en;
+            document.getElementById('d-sanskrit').textContent = pose.sanskrit;
+            document.getElementById('d-info').textContent = pose.info;
+            
+            const makeList = (arr, elId) => {
+                const el = document.getElementById(elId);
+                el.innerHTML = arr.map(txt => `<li>${txt}</li>`).join('');
+            };
+
+            makeList(pose.benefits, 'd-benefits');
+            makeList(pose.cautions, 'd-cautions');
+
+            navigate('details');
+        }
+
+        function showAnimation() {
+            const pose = state.currentPose;
+            const name = state.lang === 'hi' ? pose.hi : pose.en;
+            document.getElementById('a-title').textContent = name;
+            navigate('animation');
+        }
+
+        // --- MENU & SETTINGS ---
+        function toggleMenu(forceClose = false) {
+            const modal = document.getElementById('side-menu');
+            const panel = document.getElementById('menu-panel');
+            
+            if (modal.classList.contains('hidden') && !forceClose) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    panel.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                modal.classList.add('opacity-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        function toggleLang() {
+            state.lang = state.lang === 'hi' ? 'en' : 'hi';
+            updateUI();
+        }
+
+        function toggleTheme() {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            if (state.theme === 'light') {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const t = DICT[state.lang];
+            
+            // Login
+            document.getElementById('login-card-title').textContent = t.login_header; 
+            document.getElementById('btn-login').textContent = t.login_btn;
+            
+            // Dashboard
+            document.getElementById('dash-title').textContent = t.dash_title;
+            document.getElementById('dash-motto').textContent = t.dash_motto; 
+            document.getElementById('search-input').placeholder = t.search_ph;
+
+            // Details
+            document.getElementById('btn-back').textContent = t.btn_back;
+            document.getElementById('lbl-info').textContent = t.lbl_info;
+            document.getElementById('lbl-benefits').textContent = t.lbl_benefits;
+            document.getElementById('lbl-cautions').textContent = t.lbl_cautions;
+            document.getElementById('btn-anim').textContent = t.btn_anim;
+
+            // Animation
+            document.getElementById('btn-back-anim').textContent = t.btn_back_anim;
+            document.getElementById('lbl-anim-sub').textContent = t.lbl_anim_sub;
+
+            // Chat
+            document.getElementById('chat-title').textContent = t.chat_title;
+            document.getElementById('chat-subtitle').textContent = t.chat_subtitle;
+            document.getElementById('btn-back-chat').textContent = t.btn_back_chat;
+            document.getElementById('chat-initial').textContent = t.chat_initial;
+            document.getElementById('loading-indicator').querySelector('p').innerHTML = `<i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i> ${t.chat_loading}`;
+            
+            // Menu
+            document.getElementById('menu-title').textContent = t.menu_title;
+            document.getElementById('lbl-lang').textContent = t.lbl_lang;
+            document.getElementById('lbl-theme').textContent = t.lbl_theme;
+            document.getElementById('btn-logout').textContent = t.btn_logout;
+
+            // Buttons State Text
+            document.getElementById('lang-btn').textContent = state.lang.toUpperCase();
+            document.getElementById('theme-btn').textContent = state.theme === 'dark' ? t.theme_dark : t.theme_light;
+            
+            // Update login error message if visible
+            const errorDisplay = document.getElementById('login-error');
+            if (!errorDisplay.classList.contains('hidden')) {
+                 errorDisplay.textContent = t.login_error;
+            }
+
+            // Re-render UI elements
+            const currentSectionId = document.querySelector('.page-section.active')?.id || 'login';
+            if (currentSectionId === 'dashboard') renderGrid();
+            if (currentSectionId === 'details' && state.currentPose) loadDetails(state.currentPose);
+
+            lucide.createIcons();
+        }
+        
+        // --- AI CHAT FUNCTIONS ---
+
+        function displayMessage(text, role) {
+            const chatWindow = document.getElementById('chat-window');
+            const msgDiv = document.createElement('div');
+            
+            msgDiv.className = `p-3 rounded-xl shadow-md text-base break-words max-w-xs sm:max-w-md ${role === 'user' ? 'user-message ml-auto' : 'ai-message mr-auto'}`;
+            
+            // Support for Markdown/HTML in AI responses (if necessary, though sticking to plain text for simplicity)
+            msgDiv.textContent = text;
+            
+            chatWindow.appendChild(msgDiv);
+            
+            // Scroll to the bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+        
+        function showLoading(isLoading) {
+            document.getElementById('loading-indicator').classList.toggle('hidden', !isLoading);
+            document.getElementById('send-btn').disabled = isLoading;
+            document.getElementById('chat-input').disabled = isLoading;
+        }
+        
+        async function exponentialBackoffFetch(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                         // Throw error to trigger retry if status is >= 500 (Server error)
+                         if (response.status >= 500) throw new Error(`Server error: ${response.status}`);
+                         // For client errors (4xx), stop and process the error response immediately
+                         return response; 
+                    }
+                    return response;
+                } catch (error) {
+                    if (i < retries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Exponential backoff
+                    } else {
+                        throw error; // Throw final error
+                    }
+                }
+            }
+        }
+
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const userPrompt = input.value.trim();
+
+            if (!userPrompt) return;
+
+            // 1. Display user message
+            displayMessage(userPrompt, 'user');
+            input.value = ''; // Clear input
+            showLoading(true);
+
+            // 2. Add to chat history (Gemini format)
+            chatHistory.push({ role: "user", parts: [{ text: userPrompt }] });
+            
+            // 3. Construct API Payload
+            // UPDATED SYSTEM PROMPT: Enhanced persona for better, less "scripted" responses
+            const systemPrompt = "आप YogaVerse Pro के लिए एक सहायक (Assistant) हैं, जो योग और कल्याण (Wellness) पर केंद्रित है। आपकी भाषा विनम्र, प्रोत्साहित करने वाली (encouraging) और ज्ञानपूर्ण होनी चाहिए। उपयोगकर्ता के सवालों का जवाब देते समय, उन्हें उनके योगाभ्यास में मदद करने पर ध्यान दें। उत्तर संक्षिप्त, सटीक और हमेशा हिंदी या अंग्रेजी (जिस भाषा में प्रश्न पूछा गया हो) में दें। आप आसनों, स्वास्थ्य, ध्यान और जीवनशैली के बारे में मार्गदर्शन कर सकते हैं।";
+            
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+            
+            // 4. Call Gemini API
+            try {
+                const response = await exponentialBackoffFetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const candidate = result.candidates?.[0];
+                    let aiText = "क्षमा करें, मुझे आपका जवाब नहीं मिल सका।";
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        aiText = candidate.content.parts[0].text;
+                    }
+
+                    // 5. Display AI message and update history
+                    displayMessage(aiText, 'ai');
+                    chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+                } else {
+                    const errorMsg = result.error?.message || "API से जवाब प्राप्त करने में त्रुटि।";
+                    displayMessage(`त्रुटि: ${errorMsg}`, 'ai');
+                    // Remove last user message from history on error to prevent bad context
+                    chatHistory.pop(); 
+                }
+
+            } catch (error) {
+                console.error("Gemini API Call Failed:", error);
+                displayMessage("नेटवर्क या सर्वर त्रुटि। कृपया बाद में प्रयास करें।", 'ai');
+                chatHistory.pop(); 
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Initial Render
+        updateUI();
+        renderGrid();
+        
+    </script>
+</body>
+</html>
