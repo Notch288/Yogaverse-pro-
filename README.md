@@ -16,9 +16,10 @@ This project was created for learning and experimenting with AI integration in a
 
 ## Technologies Used
 - HTML
-- CSS
-- JavaScript
 - Google Gemini API
 - GitHub Pages
 
 Created by Notch288 🔥
+
+follow on Insta- https://www.instagram.com/tnr_unknown_731?igsh=d25ydzhweHI0NmVw
+tele- t.me/ExoUnknown
